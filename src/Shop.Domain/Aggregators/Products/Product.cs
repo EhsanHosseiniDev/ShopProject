@@ -1,13 +1,15 @@
-﻿namespace Shop.Domain.Aggregators.Products;
+﻿using System;
+
+namespace Shop.Domain.Aggregators.Products;
 
 public class Product
 {
-    public long Id { get; private set; }
+    public Guid Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public Money Price { get; private set; } = Money.Zero;
     public int Quantity { get; private set; }
 
-    public Product(long productId, string name, Money price, int quantity)
+    public Product(Guid productId, string name, Money price, int quantity)
     {
         Id = productId;
         Name = name;
@@ -17,4 +19,3 @@ public class Product
 
     public void ReduceStock(int quantity) => Quantity += quantity;
 }
-

@@ -7,13 +7,15 @@ namespace Shop.Domain.Aggregators.Orders;
 
 public class Order
 {
-    public long Id { get; private set; }
+    public Guid Id { get; private set; }
+    public Guid CustomerId { get; set; }
     public List<CartItem> Items { get; private set; }
     public Money TotalAmount { get; private set; }
     public bool IsPaid { get; private set; }
-
-    public Order(IEnumerable<CartItem> items, Money total)
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public Order(Guid customerId, IEnumerable<CartItem> items, Money total)
     {
+        CustomerId = customerId;
         Items = new(items);
         TotalAmount = total;
         IsPaid = false;

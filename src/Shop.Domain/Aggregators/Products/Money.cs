@@ -11,4 +11,5 @@ public record Money(decimal Amount, string Currency)
     public static Money operator *(Money money, decimal multiplier) => new(money.Amount * multiplier, money.Currency);
 
     public override string ToString() => $"{Amount:0.00} {Currency}";
+    public static implicit operator decimal(Money money) => money.Amount;
 }
