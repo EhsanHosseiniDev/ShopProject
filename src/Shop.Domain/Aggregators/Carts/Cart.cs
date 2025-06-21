@@ -8,7 +8,7 @@ namespace Shop.Domain.Aggregators.Carts;
 public class Cart
 {
     private readonly List<CartItem> _items = new();
-    private IDiscountStrategy _discount = new NoDIscount();
+    private IDiscountStrategy _discount = new NoDiscount();
 
     public IReadOnlyList<CartItem> Items => _items;
 
@@ -34,6 +34,6 @@ public class Cart
     public Money CalculateTotal()
     {
         var total = _items.Select(i => i.TotalPrice).Aggregate(Money.Zero, (acc, next) => acc + next);
-        return _discount.Apply(total);
+        return _discount.Apply(total, Items);
     }
 }

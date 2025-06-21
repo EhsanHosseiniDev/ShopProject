@@ -5,9 +5,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Aggregators\Carts\" />
-    <Folder Include="Aggregators\Orders\" />
-  </ItemGroup>
-
 </Project>
