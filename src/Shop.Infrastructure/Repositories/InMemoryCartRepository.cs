@@ -7,7 +7,7 @@ public class InMemoryCartRepository : ICartRepository
     public Task<Cart?> GetByCustomerIdAsync(Guid customerId)
     {
         var cart = _carts.FirstOrDefault(c => c.CustomerId == customerId);
-        return Task.FromResult<Cart?>(cart);
+        return Task.FromResult(cart);
     }
 
     public Task SaveAsync(Cart entity)

@@ -7,14 +7,30 @@ public class InMemoryProductRepository : IProductRepository
 
     public InMemoryProductRepository()
     {
+        var baseNames = new[]
+        {
+            "Wireless Mouse", "Gaming Keyboard", "Bluetooth Speaker",
+            "USB-C Charger", "HDMI Cable", "Webcam", "Laptop Stand",
+            "External SSD", "Noise-Canceling Headphones", "Smartphone Holder"
+        };
+
         var fixture = new Fixture();
-        _products = fixture.Build<Product>()
-            .With(p => p.Id, Guid.NewGuid)
-            .With(p => p.Name, () => fixture.Create<string>().Substring(0, 8))
-            .With(p => p.Price, () => fixture.Create<decimal>() % 100 + 1)
-            .With(p => p.Quantity, () => fixture.Create<int>() % 50 + 1)
-            .CreateMany(50)
-            .ToList();
+        var products = new List<Product>();
+
+        for (int i = 0; i < 50; i++)
+        {
+            var nameIndex = i % baseNames.Length;
+            var uniqueName = $"{baseNames[nameIndex]} #{i + 1}";
+
+            products.Add(new Product(
+                Guid.NewGuid(),
+                uniqueName,
+                new Money(10 + i % 30),
+                5 + i % 20
+            ));
+        }
+
+        _products = products;
     }
 
     public Task<PagedResult<Product>> GetPagedAsync(int page, int pageSize)

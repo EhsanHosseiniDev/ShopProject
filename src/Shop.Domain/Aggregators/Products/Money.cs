@@ -2,8 +2,23 @@
 
 namespace Shop.Domain.Aggregators.Products;
 
-public record Money(decimal Amount, string Currency)
+public record Money
 {
+    public decimal Amount { get; set; }
+    public string Currency { get; set; }
+
+    public Money(decimal amount, string currency)
+    {
+        Amount = amount;
+        Currency = currency;
+    }
+
+    public Money(decimal amount)
+    {
+        Amount = amount;
+        Currency = GlobalStatic.EURO;
+    }
+
     public static Money Zero => new(0, GlobalStatic.EURO);
 
     public static Money operator +(Money a, Money b) => new(a.Amount + b.Amount, a.Currency);
