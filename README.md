@@ -2,7 +2,7 @@
 
 This document defines the high-level business goals and detailed user stories for the **Shop** proof of concept, developed using **.NET 8,  WebAssembly, and Blazor Hybrid (MAUI)** with **DDD, CQRS, and TDD** principles.
 
-![Test Status](https://github.com/USERNAME/REPOSITORY_NAME/actions/workflows/RunTest.yml/badge.svg)
+![Test Status](https://github.com/EhsanHosseiniDev/ShopProject/actions/workflows/RunTest.yml/badge.svg)
 
 ---
 
