@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shop.Domain.Common;
+using System;
 
 namespace Shop.Domain.Aggregators.Products;
 
@@ -16,6 +17,4 @@ public class Product
         Price = price;
         Quantity = quantity;
     }
-
-    public void ReduceStock(int quantity) => Quantity += quantity;
 }

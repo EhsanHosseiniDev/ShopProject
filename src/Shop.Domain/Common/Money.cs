@@ -1,6 +1,4 @@
-﻿using Shop.Domain.Common;
-
-namespace Shop.Domain.Aggregators.Products;
+﻿namespace Shop.Domain.Common;
 
 public record Money
 {

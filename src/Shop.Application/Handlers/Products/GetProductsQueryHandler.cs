@@ -3,9 +3,9 @@ using Shop.Domain.Aggregators.Products;
 
 public class GetProductsQueryHandler(IProductRepository productRepository) : IRequestHandler<GetProductsQuery, PagedProductDtoResult>
 {
-    public async Task<PagedProductDtoResult> Handle(GetProductsQuery request, CancellationToken cancellationToken)
+    public Task<PagedProductDtoResult> Handle(GetProductsQuery request, CancellationToken cancellationToken)
     {
-        var allProducts = await productRepository.GetPagedAsync(request.Page, request.PageSize);
+        var allProducts = productRepository.GetPaged(request.Page, request.PageSize);
 
         var dtos = allProducts.Items.Select(p => new ProductDto(
             p.Id,
@@ -14,6 +14,6 @@ public class GetProductsQueryHandler(IProductRepository productRepository) : IRe
             p.Quantity
         )).ToList();
 
-        return new PagedProductDtoResult(dtos, allProducts.TotalCount, request.Page, request.PageSize);
+        return Task.FromResult(new PagedProductDtoResult(dtos, allProducts.TotalCount, request.Page, request.PageSize));
     }
 }

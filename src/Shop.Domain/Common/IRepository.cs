@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 
 namespace Shop.Domain.Common;
 
 public interface IRepository<TEntity> where TEntity : class
 {
-    Task SaveAsync(TEntity entity);
+    TEntity? Find(Guid entityId);
+    void Add(TEntity entity);
 }

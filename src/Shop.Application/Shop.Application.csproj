@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Shop.Application.Command\Shop.Application.Command.csproj" />
-    <ProjectReference Include="..\Shop.Domain\Shop.Domain.csproj" />
+    <ProjectReference Include="..\Shop.DomainService\Shop.DomainService.csproj" />
     <ProjectReference Include="..\Shop.Infrastructure\Shop.Infrastructure.csproj" />
   </ItemGroup>
 

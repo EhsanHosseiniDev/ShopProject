@@ -11,14 +11,14 @@ public class RemoveProductFromCartHandler : IRequestHandler<RemoveProductFromCar
         _cartRepository = cartRepository;
     }
 
-    public async Task<RemoveProductFromCartResult> Handle(RemoveProductFromCartCommand command, CancellationToken cancellationToken)
+    public Task<RemoveProductFromCartResult> Handle(RemoveProductFromCartCommand command, CancellationToken cancellationToken)
     {
-        var cart = await _cartRepository.GetByCustomerIdAsync(command.CustomerId)
+        var cart = _cartRepository.GetByCustomerId(command.CustomerId)
                    ?? throw new InvalidOperationException("Cart not found");
 
         cart.RemoveProduct(command.ProductId);
-        await _cartRepository.SaveAsync(cart);
+        _cartRepository.Add(cart);
 
-        return new RemoveProductFromCartResult(true, command.CustomerId, command.ProductId, cart.Items.Count, cart.CalculateTotal());
+        return Task.FromResult(new RemoveProductFromCartResult(true, command.CustomerId, command.ProductId, cart.Items.Count, cart.CalculateTotal()));
     }
 }

@@ -11,14 +11,14 @@ public class UpdateCartItemQuantityHandler : IRequestHandler<UpdateCartItemQuant
         _cartRepository = cartRepository;
     }
 
-    public async Task<UpdateCartItemQuantityResult> Handle(UpdateCartItemQuantityCommand command, CancellationToken cancellationToken)
+    public Task<UpdateCartItemQuantityResult> Handle(UpdateCartItemQuantityCommand command, CancellationToken cancellationToken)
     {
-        var cart = await _cartRepository.GetByCustomerIdAsync(command.CustomerId)
+        var cart = _cartRepository.GetByCustomerId(command.CustomerId)
                    ?? throw new InvalidOperationException("Cart not found");
 
         cart.UpdateQuantity(command.ProductId, command.NewQuantity);
-        await _cartRepository.SaveAsync(cart);
+        _cartRepository.UpdateCart(cart);
 
-        return new UpdateCartItemQuantityResult(true, command.CustomerId, command.ProductId, command.NewQuantity, cart.CalculateTotal());
+        return Task.FromResult(new UpdateCartItemQuantityResult(true, command.CustomerId, command.ProductId, command.NewQuantity, cart.CalculateTotal()));
     }
 }

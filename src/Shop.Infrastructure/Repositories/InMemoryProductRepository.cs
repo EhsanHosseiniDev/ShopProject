@@ -1,14 +1,35 @@
 ﻿using AutoFixture;
 using Shop.Domain.Aggregators.Products;
+using Shop.Domain.Common;
 
 public class InMemoryProductRepository : IProductRepository
 {
-    private readonly List<Product> _products;
+    private List<Product>? _products;
+    private List<Product> Products => _products ??= GenerateRandomProducts();
 
-    public InMemoryProductRepository()
+    public PagedResult<Product> GetPaged(int page, int pageSize)
+    {
+        var skip = (page - 1) * pageSize;
+        var items = Products.Skip(skip).Take(pageSize).ToList();
+        return new PagedResult<Product>(items, Products.Count, page, pageSize);
+    }
+
+    public Product? Find(Guid entityId) => Products.FirstOrDefault(p => p.Id == entityId);
+
+    public void Add(Product entity)
+    {
+        var existing = Products.FirstOrDefault(p => p.Id == entity.Id);
+        if (existing != null)
+        {
+            Products.Remove(existing);
+        }
+        Products.Add(entity);
+    }
+
+    private List<Product> GenerateRandomProducts()
     {
         var baseNames = new[]
-        {
+                {
             "Wireless Mouse", "Gaming Keyboard", "Bluetooth Speaker",
             "USB-C Charger", "HDMI Cable", "Webcam", "Laptop Stand",
             "External SSD", "Noise-Canceling Headphones", "Smartphone Holder"
@@ -30,30 +51,6 @@ public class InMemoryProductRepository : IProductRepository
             ));
         }
 
-        _products = products;
-    }
-
-    public Task<PagedResult<Product>> GetPagedAsync(int page, int pageSize)
-    {
-        var skip = (page - 1) * pageSize;
-        var items = _products.Skip(skip).Take(pageSize).ToList();
-        return Task.FromResult(new PagedResult<Product>(items, _products.Count, page, pageSize));
-    }
-
-    public Task<Product> GetByIdAsync(Guid productId)
-    {
-        var product = _products.FirstOrDefault(p => p.Id == productId);
-        return Task.FromResult(product);
-    }
-
-    public Task SaveAsync(Product entity)
-    {
-        var existing = _products.FirstOrDefault(p => p.Id == entity.Id);
-        if (existing != null)
-        {
-            _products.Remove(existing);
-        }
-        _products.Add(entity);
-        return Task.CompletedTask;
+        return products;
     }
 }

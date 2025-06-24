@@ -1,43 +1,40 @@
-﻿using Shop.Domain.Aggregators.Discounts;
-using Shop.Domain.Aggregators.Products;
+﻿using Shop.Domain.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Shop.Domain.Aggregators.Carts;
 
-public class Cart(Guid customerId)
+public class Cart(Guid customerId, string customerName)
 {
-    private readonly List<CartItem> _items = new();
-    private IDiscountStrategy _discount = new NoDiscount();
+    public Guid Id { get; private set; } = Guid.NewGuid();
+    public List<CartItem> Items { get; private set; } = new();
+    public Guid CustomerId { get; private set; } = customerId;
+    public string CustomerName { get; private set; } = customerName;
 
-    public IReadOnlyList<CartItem> Items => _items;
-
-    public Guid CustomerId { get; } = customerId;
-
-    public void AddProduct(Product product, int quantity)
+    public void AddProduct(Guid productId, string productname, Money price, int quantity)
     {
-        var existing = _items.FirstOrDefault(i => i.Product.Id == product.Id);
+        var existing = Items.FirstOrDefault(i => i.ProductId == productId);
         if (existing != null)
         {
-            _items.Remove(existing);
-            _items.Add(new CartItem(product, existing.Quantity + quantity));
+            Items.Remove(existing);
+            Items.Add(new CartItem(productId, productname, price, existing.Quantity + quantity));
         }
         else
         {
-            _items.Add(new CartItem(product, quantity));
+            Items.Add(new CartItem(productId, productname, price, quantity));
         }
     }
 
     public void UpdateQuantity(Guid productId, int newQuantity)
     {
-        var item = _items.FirstOrDefault(i => i.Product.Id == productId);
+        var item = Items.FirstOrDefault(i => i.ProductId == productId);
         if (item == null)
             throw new InvalidOperationException("Product not found in cart");
 
         if (newQuantity <= 0)
         {
-            _items.Remove(item);
+            Items.Remove(item);
         }
         else
         {
@@ -45,23 +42,15 @@ public class Cart(Guid customerId)
         }
     }
 
-    public void ApplyDiscount(IDiscountStrategy discountStrategy)
-    {
-        _discount = discountStrategy;
-    }
-
-    public Money CalculateTotal()
-    {
-        var total = _items.Select(i => i.TotalPrice).Aggregate(Money.Zero, (acc, next) => acc + next);
-        return _discount.Apply(total, Items);
-    }
-
     public void RemoveProduct(Guid productId)
     {
-        var item = _items.FirstOrDefault(i => i.Product.Id == productId);
+        var item = Items.FirstOrDefault(i => i.ProductId == productId);
         if (item == null)
             throw new InvalidOperationException("Product not found in cart");
 
-        _items.Remove(item);
+        Items.Remove(item);
     }
+
+    public Money CalculateTotal()
+        => Items.Select(i => i.TotalPrice).Aggregate(Money.Zero, (acc, next) => acc + next);
 }

@@ -1,20 +1,18 @@
-﻿namespace Shop.Test;
+﻿using Shop.Domain.Common;
+using Shop.DomainService.Discounts.DiscountPolicy;
 
-public class DiscountCommandTests
+namespace Shop.Test;
+
+public class DiscountCommandTests : IClassFixture<StartupFixture>
 {
     [Theory]
     [InlineData(200, 10, 180)]
     [InlineData(1000, 20, 800)]
-    public void Should_apply_valid_percentage_discount(decimal originalPrice, decimal percent, decimal expected)
+    public void ShouldApplyValidPercentageDiscount(decimal originalPrice, decimal percent, decimal expected)
     {
-        
-    }
+        var percentageDiscountPolicy = new PercentageDiscountPolicy(percent);
+        var result= percentageDiscountPolicy.Apply(new Money(originalPrice),Guid.NewGuid());
 
-    [Theory]
-    [InlineData(500)]
-    [InlineData(1000)]
-    public void Should_fallback_to_no_discount_for_invalid_code(decimal originalPrice)
-    {
-        
+        Assert.Equal(expected, result);
     }
 }

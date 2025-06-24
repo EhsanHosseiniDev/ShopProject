@@ -4,7 +4,7 @@ public class InMemoryOrderRepository : IOrderRepository
 {
     private readonly List<Order> _orders = new();
 
-    public Task SaveAsync(Order entity)
+    public void Add(Order entity)
     {
         var existing = _orders.FirstOrDefault(o => o.Id == entity.Id);
         if (existing != null)
@@ -12,6 +12,7 @@ public class InMemoryOrderRepository : IOrderRepository
             _orders.Remove(existing);
         }
         _orders.Add(entity);
-        return Task.CompletedTask;
     }
+
+    public Order? Find(Guid entityId) => _orders.FirstOrDefault(o => o.Id == entityId);
 }
