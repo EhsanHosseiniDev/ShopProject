@@ -1,5 +1,4 @@
 ﻿using Shop.Domain.Common;
-using System;
 
 namespace Shop.DomainService.Discounts.DiscountPolicy;
 

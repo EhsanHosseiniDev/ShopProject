@@ -1,0 +1,56 @@
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Components
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+    @foreach (var product in PagedResult.ProductDtos)
+    {
+        <div class="col">
+            @if (ItemTemplate is not null)
+            {
+                @ItemTemplate(product)
+            }
+            else
+            {
+                <div class="card h-100 shadow-sm">
+                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 180px;">
+                        @((MarkupString)GetRandomSvg(product.Id))
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text text-muted">In Stock: @product.Quantity</p>
+                        <p class="card-text fw-bold">@product.Price.ToString("C0", CultureInfo.GetCultureInfo("en-US"))</p>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-sm btn-primary" @onclick="() => OnAddToCart.InvokeAsync(product.Id)">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@if (TotalPages > 1)
+{
+    @if (PaginationTemplate is not null)
+    {
+        @PaginationTemplate((PagedResult.Page, TotalPages))
+    }
+    else
+    {
+        <nav>
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= TotalPages; i++)
+                {
+                    var pageIndex = i;
+                    <li class="page-item @(PagedResult.Page == pageIndex ? "active" : "")">
+                        <button class="page-link" @onclick="() => OnClickPage(pageIndex)">
+                            @pageIndex
+                        </button>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}

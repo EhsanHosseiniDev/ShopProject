@@ -1,8 +1,12 @@
 ﻿using Shop.Domain.Aggregators.Users;
+using Shop.Domain.Common;
 
 public class InMemoryCustomerRepository : ICustomerRepository
 {
-    private readonly List<Customer> _customer = new();
+    private readonly List<Customer> _customer = new()
+    {
+        new(){Id=GlobalStatic.CustomerId,Name="customer #1"}
+    };
 
     public void Add(Customer entity)
     {
@@ -14,5 +18,6 @@ public class InMemoryCustomerRepository : ICustomerRepository
         _customer.Add(entity);
     }
 
-    public Customer? Find(Guid entityId) => _customer.FirstOrDefault(o => o.Id == entityId);
+    public Customer? Find(Guid entityId) => _customer.FirstOrDefault();
+
 }

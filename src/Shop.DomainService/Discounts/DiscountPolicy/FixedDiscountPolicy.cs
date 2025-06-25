@@ -9,4 +9,6 @@ public class FixedDiscountPolicy : IDiscountPolicy
 
     public Money Apply(Money originalPrice, Guid customerId)
         => new Money(originalPrice.Amount - _amount);
+
+    public override string ToString() => $"{nameof(FixedDiscountPolicy)}-{_amount}";
 }

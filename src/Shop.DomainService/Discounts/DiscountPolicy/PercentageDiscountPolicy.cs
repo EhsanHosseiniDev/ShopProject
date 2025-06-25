@@ -9,4 +9,6 @@ public class PercentageDiscountPolicy : IDiscountPolicy
 
     public Money Apply(Money originalPrice, Guid customerId)
         => originalPrice * (1 - _percent / 100);
+
+    public override string ToString() => $"{nameof(PercentageDiscountPolicy)}-{_percent}";
 }

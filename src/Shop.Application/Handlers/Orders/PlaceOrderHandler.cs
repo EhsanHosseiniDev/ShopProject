@@ -33,7 +33,7 @@ public class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, PlaceOrderRe
         var discountPolicy=_discountPolicyProvider.GetPolicy(command.discountCode);
         _cartCalculator.ApplyDiscount(discountPolicy);
 
-        var order = new Order(cart.CustomerId, cart.Items.ToOrderItems(),_cartCalculator.CalculateTotalCartItems(cart));
+        var order = new Order(cart.CustomerId, cart.Items.ToOrderItems(),_cartCalculator.CalculateTotalCartItems(cart).EffectedDiscountAmount);
         _orderRepository.Add(order);
 
         return Task.FromResult(new PlaceOrderResult(order.Id, order.CustomerId, order.CreatedAt, order.Items.Count, order.TotalAmount));

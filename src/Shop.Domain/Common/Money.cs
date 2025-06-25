@@ -20,6 +20,7 @@ public record Money
     public static Money Zero => new(0, GlobalStatic.EURO);
 
     public static Money operator +(Money a, Money b) => new(a.Amount + b.Amount, a.Currency);
+    public static Money operator -(Money a, Money b) => new(a.Amount - b.Amount, a.Currency);
     public static Money operator *(Money money, int multiplier) => new(money.Amount * multiplier, money.Currency);
     public static Money operator *(Money money, decimal multiplier) => new(money.Amount * multiplier, money.Currency);
 

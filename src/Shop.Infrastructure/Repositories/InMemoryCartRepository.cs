@@ -1,4 +1,5 @@
 ﻿using Shop.Domain.Aggregators.Carts;
+using Shop.Domain.Common;
 
 public class InMemoryCartRepository : ICartRepository
 {
@@ -6,7 +7,7 @@ public class InMemoryCartRepository : ICartRepository
 
     public void Add(Cart entity)
     {
-        var existing = _carts.FirstOrDefault(c => c.CustomerId == entity.CustomerId);
+        var existing = _carts.FirstOrDefault(c => c.CustomerId == GlobalStatic.CustomerId);
         if (existing != null)
         {
             _carts.Remove(existing);
@@ -16,7 +17,7 @@ public class InMemoryCartRepository : ICartRepository
 
     public Cart? Find(Guid entityId) => _carts.FirstOrDefault(c => c.Id == entityId);
 
-    public Cart? GetByCustomerId(Guid customId) => _carts.FirstOrDefault(c => c.CustomerId == customId);
+    public Cart? GetByCustomerId(Guid customId) => _carts.FirstOrDefault(c => c.CustomerId == GlobalStatic.CustomerId);
 
     public void UpdateCart(Cart cart)
     {

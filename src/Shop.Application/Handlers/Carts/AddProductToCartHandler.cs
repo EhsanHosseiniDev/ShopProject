@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using Shop.Application.Command.Carts.Commands;
 using Shop.Domain.Aggregators.Carts;
+using Shop.Domain.Aggregators.Orders;
 using Shop.Domain.Aggregators.Products;
 using Shop.Domain.Aggregators.Users;
 using Shop.DomainService.CartCalulators;
 using Shop.DomainService.Discounts.DiscountProvider;
-
 public class AddProductToCartHandler : IRequestHandler<AddProductToCartCommand, AddProductToCartResult>
 {
     private readonly IProductRepository _productReposiroey;
@@ -41,6 +41,8 @@ public class AddProductToCartHandler : IRequestHandler<AddProductToCartCommand, 
     {
         var customer = _customerRepository.Find(customerId) ??
             throw new InvalidOperationException("Customer not found");
-        return new Cart(customer.Id, customer.Name);
+        var cart = new Cart(customer.Id, customer.Name);
+        _cartRepository.Add(cart);
+        return cart;
     }
 }

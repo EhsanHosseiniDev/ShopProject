@@ -1,0 +1,62 @@
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Components
+
+@if (pagedResult is not null)
+{
+    <div class="d-flex justify-content-between align-items-center px-4 mb-3">
+        <h4>Product List</h4>
+
+        @if (PageSizeSelectorTemplate is not null)
+        {
+            @PageSizeSelectorTemplate((currentPage, pageSize, EventCallback.Factory.Create<ChangeEventArgs>(this, OnPageSizeChanged), pageSizes))
+        }
+        else
+        {
+            <div>
+                <label for="pageSizeSelect" class="me-2">Page Size:</label>
+                <select class="form-select" @onchange="OnPageSizeChanged">
+                    @foreach (var size in pageSizes)
+                    {
+                        <option value="@size" selected="@(size == pageSize)">@size</option>
+                    }
+                </select>
+            </div>
+        }
+    </div>
+
+    @if (ItemTemplate is null && PaginationTemplate is null)
+    {
+        <ProductList PagedResult="@pagedResult"
+                     OnPageChanged="@HandlePageChanged"
+                     OnAddToCart="@HandleAddToCart" />
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+            @foreach (var product in pagedResult.ProductDtos)
+            {
+                <div class="col">
+                    @if (ItemTemplate is not null)
+                    {
+                        @ItemTemplate(product)
+                    }
+                </div>
+            }
+        </div>
+
+        @if ((int)Math.Ceiling((double)pagedResult.TotalCount / pageSize) > 1)
+        {
+            @if (PaginationTemplate is not null)
+            {
+                @PaginationTemplate((pagedResult.Page, (int)Math.Ceiling((double)pagedResult.TotalCount / pageSize)))
+            }
+        }
+    }
+}
+else
+{
+    <p>Loading products...</p>
+}
+
+
+
