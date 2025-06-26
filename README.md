@@ -1,6 +1,6 @@
-﻿# 🛒 Shop – User Story Documentation (EPIC & Detailed Stories)
+# 🛒 Shop – User Story Documentation
 
-This document defines the high-level business goals and detailed user stories for the **Shop** proof of concept, developed using **.NET 8,  WebAssembly, and Blazor Hybrid (MAUI)** with **DDD, CQRS, and TDD** principles.
+This project is a **proof-of-concept shopping experience** built using **.NET 8**, **WebAssembly**, and **Blazor Hybrid (MAUI)**. The architecture follows **DDD**, **CQRS**, and **Clean Architecture** principles.
 
 ![Test Status](https://github.com/EhsanHosseiniDev/ShopProject/actions/workflows/RunTest.yml/badge.svg)
 ![Last Commit](https://img.shields.io/github/last-commit/EhsanHosseiniDev/ShopProject)
@@ -10,7 +10,7 @@ This document defines the high-level business goals and detailed user stories fo
 
 ## 📌 EPIC: Full Shopping Experience
 
-> As a customer, I want to browse available products, add items to my cart, apply discounts, place orders, and make secure payments so that I can complete my purchase conveniently.
+> As a customer, I want to browse products, manage my cart, apply discounts, place an order, and complete payment — all within a smooth and reliable shopping flow.
 
 ---
 
@@ -19,14 +19,14 @@ This document defines the high-level business goals and detailed user stories fo
 ### ✅ \[US001] Browse Products
 
 **As a** customer,
-**I want to** view a list of available products with names, prices, and stock status,
+**I want to** view a paginated list of available products with names, prices, and stock status,
 **So that** I can choose which items to add to my cart.
 
-* **Query:** `GetAvailableProductsQuery`
+* **Query:** `GetProductsQuery(int Page, int PageSize)`
 * **Acceptance Criteria:**
 
-  * Products are shown in cards or list format
-  * Each product displays name, price, and availability
+  * Products are listed with name, price, availability
+  * Supports pagination with `Page` and `PageSize`
 
 ---
 
@@ -36,77 +36,87 @@ This document defines the high-level business goals and detailed user stories fo
 **I want to** add a selected product with a quantity to my cart,
 **So that** I can later check out and place an order.
 
-* **Command:** `AddProductToCartCommand`
+* **Command:** `AddProductToCartCommand(Guid CustomerId, Guid ProductId, int Quantity)`
 * **Acceptance Criteria:**
 
-  * Cart updates to include selected product
-  * Quantity is validated against stock
-  * Total price updates accordingly
+  * Product is added if quantity is valid and in stock
+  * Cart updates with new item and price
 
 ---
 
-### ✅ \[US003] Apply Discount Code
+### ✅ \[US003] Remove Product from Cart
 
 **As a** customer,
-**I want to** enter a valid discount code,
-**So that** I can receive a reduced price before checkout.
+**I want to** remove a product from my cart,
+**So that** I can update my order before checkout.
 
-* **Command:** `ApplyDiscountCommand`
+* **Command:** `RemoveProductFromCartCommand(Guid CustomerId, Guid ProductId)`
 * **Acceptance Criteria:**
 
-  * Valid codes reduce total price (e.g., 10% off)
-  * Invalid/expired codes show error message
-  * Discount applied persists until checkout
+  * Product is removed from cart
+  * Cart totals are updated
 
 ---
 
-### ✅ \[US004] View Cart Summary
+### ✅ \[US004] Update Cart Item Quantity
 
 **As a** customer,
-**I want to** review my cart contents and see a summary including discounts,
-**So that** I can make changes before checking out.
+**I want to** change the quantity of a product in my cart,
+**So that** I can increase or decrease my purchase amount.
 
-* **Query:** `GetCartSummaryQuery`
+* **Command:** `UpdateCartItemQuantityCommand(Guid CustomerId, Guid ProductId, int NewQuantity)`
 * **Acceptance Criteria:**
 
-  * Summary includes each item, quantity, total price
-  * Discount, subtotal, and final total are shown
+  * Quantity updated if valid
+  * Setting quantity to 0 removes item
 
 ---
 
-### ✅ \[US005] Place an Order
+### ✅ \[US005] View Cart Summary
 
 **As a** customer,
-**I want to** confirm and place my cart as a final order,
-**So that** the system records it for fulfillment.
+**I want to** review the contents of my cart and see a summary including totals and discounts,
+**So that** I can verify before placing an order.
 
-* **Command:** `PlaceOrderCommand`
+* **Query:** `GetCartSummaryQuery(Guid CustomerId)`
 * **Acceptance Criteria:**
 
-  * Order created from cart contents
-  * Unique Order ID is returned
-  * Cart is cleared post-order
+  * Summary includes all cart items, quantities, subtotal, discounts, total
 
 ---
 
-### ✅ \[US006] Pay for an Order
+### ✅ \[US006] Place an Order
 
 **As a** customer,
-**I want to** pay for my confirmed order,
-**So that** the transaction completes and my order is processed.
+**I want to** place an order using my cart contents and a discount code,
+**So that** the system can process my purchase.
 
-* **Command:** `PayOrderCommand`
+* **Command:** `PlaceOrderCommand(Guid CustomerId, string discountCode)`
 * **Acceptance Criteria:**
 
-  * Payment reflects total (after discount)
-  * Payment status updates (pending ➝ completed)
-  * Confirmation is shown to user
+  * Valid cart is converted to order
+  * Discount applied if valid
+  * Unique order ID returned
 
 ---
 
-## 🧰 Notes:
+### ✅ \[US007] Pay for Order
 
-* All User Stories support **CQRS**: Commands modify state, Queries retrieve projections
-* All logic is implemented in an **In-Memory Domain Layer** (no DB)
-* Test cases will follow each story with **TDD-first** strategy
-* Interfaces and Services are decoupled via **Dependency Injection**
+**As a** customer,
+**I want to** pay for a confirmed order using a selected payment method,
+**So that** the transaction is completed and the order can be fulfilled.
+
+* **Command:** `PayOrderCommand(Guid OrderId, string PaymentMethod)`
+* **Acceptance Criteria:**
+
+  * Payment processes and updates status
+  * Confirmation message shown
+
+---
+
+## 🧰 Technical Notes
+
+* Uses **CQRS**: Commands mutate state, Queries return DTOs
+* **All logic** handled in an **in-memory domain** (no database)
+* Built on **Blazor Hybrid (MAUI)** for cross-platform support
+* Designed with **Clean Architecture** and **Dependency Injection**
