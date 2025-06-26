@@ -1,0 +1,15 @@
+﻿@page "/place-order"
+@rendermode InteractiveServer
+
+@using MediatR
+@using Shop.UiLibrary.IntractiveComponents.Components
+@inject IMediator Mediator
+
+<h3>Place Order</h3>
+
+<PlaceOrderView OnSubmitOrder="HandleSubmitOrder"
+                OnPayOrder="HandlePayOrder"
+                OrderResult="@OrderResult"
+                ErrorMessage="@ErrorMessage"
+                PaymentResultMessage="@PaymentResultMessage" />
+

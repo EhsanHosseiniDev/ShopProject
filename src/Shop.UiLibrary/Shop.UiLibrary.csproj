@@ -19,8 +19,4 @@
     <ProjectReference Include="..\Shop.Application.Command\Shop.Application.Command.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="IntractiveComponents\Pages\" />
-  </ItemGroup>
-
 </Project>

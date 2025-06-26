@@ -7,11 +7,9 @@
 
 @inject IMediator Mediator
 
-
-
 <PageTitle>Shop</PageTitle>
 
-<Shop OnLoadPage="LoadProducts" OnAddToCart="AddToCart" />
+<ProductView OnLoadPage="LoadProducts" OnAddToCart="AddToCart" />
 
 @code {
     private async Task<PagedProductDtoResult> LoadProducts(int page, int pageSize)

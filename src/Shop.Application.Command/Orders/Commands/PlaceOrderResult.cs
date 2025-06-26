@@ -3,5 +3,7 @@
     Guid CustomerId,
     DateTime CreatedAt,
     int TotalItems,
-    decimal TotalAmount
+    string DiscountName,
+    decimal DiscountAmount,
+    decimal PaybleAmount
 );

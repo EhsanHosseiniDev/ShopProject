@@ -4,38 +4,34 @@ using Shop.Domain.Aggregators.Orders;
 using Shop.DomainService.CartCalulators;
 using Shop.DomainService.Discounts.DiscountProvider;
 
-public class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, PlaceOrderResult>
+public class PlaceOrderHandler(ICartRepository cartRepository,
+    IOrderRepository orderRepository,
+    ICartCalculator cartCalculator,
+    IDiscountPolicyProvider discountPolicyProvider) : IRequestHandler<PlaceOrderCommand, PlaceOrderResult>
 {
-    private readonly ICartRepository _cartRepository;
-    private readonly IOrderRepository _orderRepository;
-    private readonly ICartCalculator _cartCalculator;
-    private readonly IDiscountPolicyProvider _discountPolicyProvider;
-
-    public PlaceOrderHandler(ICartRepository cartRepository, 
-        IOrderRepository orderRepository,
-        ICartCalculator cartCalculator,
-        IDiscountPolicyProvider discountPolicyProvider)
-    {
-        _cartRepository = cartRepository;
-        _orderRepository = orderRepository;
-        _cartCalculator = cartCalculator;
-        _discountPolicyProvider = discountPolicyProvider;
-    }
-
     public Task<PlaceOrderResult> Handle(PlaceOrderCommand command, CancellationToken cancellationToken)
     {
-        var cart = _cartRepository.GetByCustomerId(command.CustomerId)
+        var cart = cartRepository.GetByCustomerId(command.CustomerId)
                    ?? throw new InvalidOperationException("Cart not found");
 
         if (!cart.Items.Any())
             throw new InvalidOperationException("Cart is empty");
 
-        var discountPolicy=_discountPolicyProvider.GetPolicy(command.discountCode);
-        _cartCalculator.ApplyDiscount(discountPolicy);
+        var discountPolicy = discountPolicyProvider.GetPolicy(command.discountCode);
+        cartCalculator.ApplyDiscount(discountPolicy);
+        var calculate = cartCalculator.CalculateTotalCartItems(cart);
 
-        var order = new Order(cart.CustomerId, cart.Items.ToOrderItems(),_cartCalculator.CalculateTotalCartItems(cart).EffectedDiscountAmount);
-        _orderRepository.Add(order);
+        var order = new Order(cart.CustomerId, cart.Items.ToOrderItems(), calculate.DiscountAmount, calculate.EffectedDiscountAmount);
+        orderRepository.Add(order);
+        cartRepository.RemoveCart(cart);
+        var placeOrderResult = new PlaceOrderResult(order.Id,
+            order.CustomerId,
+            order.CreatedAt,
+            order.Items.Count,
+            calculate.DiscountName,
+            calculate.DiscountAmount,
+            calculate.EffectedDiscountAmount);
 
-        return Task.FromResult(new PlaceOrderResult(order.Id, order.CustomerId, order.CreatedAt, order.Items.Count, order.TotalAmount));
+        return Task.FromResult(placeOrderResult);
     }
 }

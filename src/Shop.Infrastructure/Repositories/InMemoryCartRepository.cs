@@ -19,6 +19,8 @@ public class InMemoryCartRepository : ICartRepository
 
     public Cart? GetByCustomerId(Guid customId) => _carts.FirstOrDefault(c => c.CustomerId == GlobalStatic.CustomerId);
 
+    public void RemoveCart(Cart cart) => _carts.Remove(cart);
+
     public void UpdateCart(Cart cart)
     {
         var findCart = _carts.Single(c => c.Id == cart.Id);

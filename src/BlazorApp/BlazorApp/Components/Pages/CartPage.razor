@@ -3,113 +3,16 @@
 
 @using MediatR
 @using Shop.Application.Command.Carts.Commands
+@using Shop.UiLibrary.IntractiveComponents.Components
+
 @inject IMediator Mediator
+@inject NavigationManager Navigation
 
-<h3>Shopping Cart</h3>
+<CartView OnQuantityChanged="ChangeQuantity"
+          OnRemoveClicked="OnRemoveClicked"
+          CartResult="CartResult" />
 
-@if (CartResult.Items == null)
+@if (CartResult.Items.Any())
 {
-    <p>Loading...</p>
-}
-else if (!CartResult.Items.Any())
-{
-    <p>Your cart is empty.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in CartResult.Items)
-            {
-                <tr>
-                    <td>@item.ProductName</td>
-                    <td>
-                        <input type="number" min="1" value="@item.Quantity"
-                               @onchange="e => OnQuantityChanged(item.ProductId, int.Parse(e.Value.ToString()))" />
-                    </td>
-                    <td>@item.Price.ToString("C")</td>
-                    <td>@item.Amount.ToString("C")</td>
-                    <td>
-                        <button class="btn btn-sm btn-danger" @onclick="() => OnRemoveClicked(item.ProductId)">
-                            Remove
-                        </button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <div class="mb-3">
-        <label>Coupon Code:</label>
-        <input class="form-control" @bind="DiscountCode" />
-        <button class="btn btn-secondary mt-1" @onclick="ApplyCoupon">Apply Coupon</button>
-    </div>
-    @if (!string.IsNullOrEmpty(DiscountCode))
-    {
-        <h6>@CartResult.DiscountName</h6>
-        <h4>discount: -@CartResult.DiscountAmount.ToString("C")</h4>
-    }
-    <h3>Total: @CartResult.PayebleAmount.ToString("C")</h3>
-
     <button class="btn btn-success mt-3" @onclick="SubmitInvoice">Checkout</button>
-}
-
-
-@code {
-    private CartResult CartResult = new();
-    private string DiscountCode = "";
-    private Guid CustomerId = Guid.NewGuid();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadCartAsync();
-    }
-
-    private async Task LoadCartAsync()
-    {
-        var command = new GetCartQuery(CustomerId, DiscountCode);
-        CartResult = await Mediator.Send(command);
-    }
-
-    private async Task OnRemoveClicked(Guid productId)
-    {
-        var result = await Mediator.Send(new RemoveProductFromCartCommand(CustomerId, productId));
-        if (result.Success)
-        {
-            await LoadCartAsync();
-        }
-    }
-
-    private async Task OnQuantityChanged(Guid productId, int newQuantity)
-    {
-        var result = await Mediator.Send(new UpdateCartItemQuantityCommand(CustomerId, productId, newQuantity));
-        if (result.Success)
-        {
-            await LoadCartAsync();
-        }
-    }
-
-    private async Task ApplyCoupon()
-    {
-        if (string.IsNullOrWhiteSpace(DiscountCode))
-            return;
-
-        await LoadCartAsync();
-    }
-
-    private async Task SubmitInvoice()
-    {
-        // Replace with SendInvoiceCommand or appropriate command
-        //await Mediator.Send(new IssueInvoiceCommand(CustomerId, CartItems, CartTotal, DiscountCode));
-        // Optionally redirect or show success
-    }
 }

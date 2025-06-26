@@ -15,4 +15,10 @@ public class InMemoryOrderRepository : IOrderRepository
     }
 
     public Order? Find(Guid entityId) => _orders.FirstOrDefault(o => o.Id == entityId);
+
+    public void UpdateOrder(Order order)
+    {
+        var findOrder = _orders.Single(c => c.Id == order.Id);
+        findOrder = order;
+    }
 }

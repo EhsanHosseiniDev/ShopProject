@@ -1,0 +1,66 @@
+﻿@using Microsoft.AspNetCore.Components
+
+<div class="place-order">
+    <h3>Place Order</h3>
+
+    <div class="mb-3">
+        <label>Discount Code:</label>
+        <input class="form-control" @bind="DiscountCode" disabled="@(isSubmitting || OrderResult is not null)" />
+    </div>
+
+    <button class="btn btn-primary"
+            disabled="@(isSubmitting || OrderResult is not null)"
+            @onclick="SubmitOrder">
+        Submit Order
+    </button>
+
+    @if (OrderResult is not null)
+    {
+        <div class="mt-4 alert alert-success">
+            <h5>Order Summary</h5>
+            <ul>
+                <li><strong>Order ID:</strong> @OrderResult.OrderId</li>
+                <li><strong>Customer ID:</strong> @OrderResult.CustomerId</li>
+                <li><strong>Date:</strong> @OrderResult.CreatedAt</li>
+                <li><strong>Total Items:</strong> @OrderResult.TotalItems</li>
+                @if (OrderResult.DiscountAmount > 0)
+                {
+                    <li><strong>Discount name:</strong> @OrderResult.DiscountName</li>
+                    <li><strong>Discount amount:</strong> @OrderResult.DiscountAmount.ToString("N0")</li>
+                }
+                <li><strong>Total Amount:</strong> @OrderResult.PaybleAmount.ToString("N0")</li>
+            </ul>
+
+            <div class="mt-3">
+                <h5>Select Payment Method:</h5>
+                @foreach (var method in PaymentMethods)
+                {
+                    <div>
+                        <input type="radio" id="@method" name="payment" value="@method"
+                               checked="@((SelectedPaymentMethod == method))"
+                               @onchange="e => OnPaymentMethodChanged(method)" />
+                        <label for="@method">@method</label>
+                    </div>
+                }
+
+                <button class="btn btn-success mt-2"
+                        disabled="@string.IsNullOrWhiteSpace(SelectedPaymentMethod)"
+                        @onclick="PayOrder">
+                    Pay Now
+                </button>
+            </div>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger mt-3">@ErrorMessage</div>
+    }
+
+    @if (!string.IsNullOrEmpty(PaymentResultMessage))
+    {
+        <div class="alert alert-info mt-3">@PaymentResultMessage</div>
+    }
+</div>
+
+

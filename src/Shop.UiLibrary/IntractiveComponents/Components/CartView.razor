@@ -1,0 +1,48 @@
+﻿@using System.Globalization
+@using Shop.Application.Command.Carts.Commands
+
+<div class="cart-view">
+    @if (CartResult?.Items == null || !CartResult.Items.Any())
+    {
+        <div class="alert alert-info">Your cart is empty.</div>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th style="width: 100px;">Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in CartResult.Items)
+                {
+                    <tr>
+                        <td>@item.ProductName</td>
+                        <td>
+                            <input type="number" class="form-control"
+                                   min="1"
+                                   value="@item.Quantity"
+                                   @onchange="e => OnQuantityChanged.InvokeAsync((item.ProductId, int.Parse(e.Value?.ToString())))">
+                        </td>
+                        <td>@item.Price.ToString("C", CultureInfo.CurrentCulture)</td>
+                        <td>@item.Amount.ToString("C", CultureInfo.CurrentCulture)</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    @onclick="() => OnRemoveClicked.InvokeAsync(item.ProductId)">
+                                Remove
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h4 class="mt-3">Total: <strong>@CartResult.PayebleAmount.ToString("C", CultureInfo.CurrentCulture)</strong></h4>
+    }
+</div>
+

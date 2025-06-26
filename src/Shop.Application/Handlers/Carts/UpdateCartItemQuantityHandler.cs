@@ -2,22 +2,15 @@
 using Shop.Application.Command.Carts.Commands;
 using Shop.Domain.Aggregators.Carts;
 
-public class UpdateCartItemQuantityHandler : IRequestHandler<UpdateCartItemQuantityCommand, UpdateCartItemQuantityResult>
+public class UpdateCartItemQuantityHandler(ICartRepository cartRepository) : IRequestHandler<UpdateCartItemQuantityCommand, UpdateCartItemQuantityResult>
 {
-    private readonly ICartRepository _cartRepository;
-
-    public UpdateCartItemQuantityHandler(ICartRepository cartRepository)
-    {
-        _cartRepository = cartRepository;
-    }
-
     public Task<UpdateCartItemQuantityResult> Handle(UpdateCartItemQuantityCommand command, CancellationToken cancellationToken)
     {
-        var cart = _cartRepository.GetByCustomerId(command.CustomerId)
+        var cart = cartRepository.GetByCustomerId(command.CustomerId)
                    ?? throw new InvalidOperationException("Cart not found");
 
         cart.UpdateQuantity(command.ProductId, command.NewQuantity);
-        _cartRepository.UpdateCart(cart);
+        cartRepository.UpdateCart(cart);
 
         return Task.FromResult(new UpdateCartItemQuantityResult(true, command.CustomerId, command.ProductId, command.NewQuantity, cart.CalculateTotal()));
     }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
 
-public record PlaceOrderCommand(Guid CustomerId,string discountCode)
+public record PlaceOrderCommand(Guid CustomerId, string discountCode)
     : IRequest<PlaceOrderResult>;
+
