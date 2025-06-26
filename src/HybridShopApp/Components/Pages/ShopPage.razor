@@ -1,0 +1,24 @@
+﻿@page "/"
+
+@using MediatR
+@using Shop.Application.Command.Carts.Commands
+@using Shop.UiLibrary.IntractiveComponents.Components
+
+@inject IMediator Mediator
+
+<PageTitle>Shop</PageTitle>
+
+<ProductView OnLoadPage="LoadProducts" OnAddToCart="AddToCart" />
+
+@code {
+    private async Task<PagedProductDtoResult> LoadProducts(int page, int pageSize)
+    {
+        return await Mediator.Send(new GetProductsQuery(page, pageSize));
+    }
+
+    private async Task<AddProductToCartResult> AddToCart(Guid productId)
+    {
+        var customerId = Guid.NewGuid();
+        return await Mediator.Send(new AddProductToCartCommand(customerId, productId, 1));
+    }
+}

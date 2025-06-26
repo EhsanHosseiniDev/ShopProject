@@ -65,8 +65,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Shop.Application.Command\Shop.Application.Command.csproj" />
       <ProjectReference Include="..\Shop.Application\Shop.Application.csproj" />
+      <ProjectReference Include="..\Shop.UiLibrary\Shop.UiLibrary.csproj" />
     </ItemGroup>
 
 </Project>

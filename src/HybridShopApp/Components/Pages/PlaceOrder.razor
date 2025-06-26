@@ -1,0 +1,36 @@
+﻿@page "/place-order"
+
+@using MediatR
+@using Shop.UiLibrary.IntractiveComponents.Components
+@inject IMediator Mediator
+
+<h3>Place Order</h3>
+
+<PlaceOrderView OnSubmitOrder="HandleSubmitOrder"
+                OnPayOrder="HandlePayOrder"
+                OrderResult="@OrderResult"
+                ErrorMessage="@ErrorMessage"
+                PaymentResultMessage="@PaymentResultMessage" />
+
+
+@code{
+    private PlaceOrderResult? OrderResult;
+    private string? ErrorMessage;
+    private string? PaymentResultMessage;
+
+    private async Task HandleSubmitOrder(string code)
+    {
+        OrderResult = await Mediator.Send(new PlaceOrderCommand(Guid.NewGuid(), code));
+    }
+
+    private async Task HandlePayOrder(string method)
+    {
+        if (OrderResult is null) return;
+
+        var result = await Mediator.Send(new PayOrderCommand(OrderResult.OrderId, method));
+        if (result.Success)
+            PaymentResultMessage = $"Payment successful. Code: {result.PaymentTrackingCode}";
+        else
+            ErrorMessage = $"Payment failed: {result.ErrorMessage}";
+    }
+}
