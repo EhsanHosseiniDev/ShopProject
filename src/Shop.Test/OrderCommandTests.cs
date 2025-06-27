@@ -7,6 +7,7 @@ using Shop.Domain.Aggregators.Orders;
 using Shop.Domain.Aggregators.Products;
 using Shop.Domain.Aggregators.Users;
 using Shop.Domain.Common;
+using Shop.DomainService.CartCalulators;
 using Shop.DomainService.Discounts.DiscountPolicy;
 using Shop.DomainService.Discounts.DiscountProvider;
 
@@ -14,13 +15,11 @@ namespace Shop.Test;
 
 public class OrderCommandTests : IClassFixture<StartupFixture>
 {
-    private readonly IMediator _mediator;
-    private readonly IOrderRepository _orderRepository;
+    private readonly ICartCalculator _cartCalculator;
 
     public OrderCommandTests(StartupFixture startupFixture)
     {
-        _mediator = startupFixture.ServiceProvider.GetRequiredService<IMediator>();
-        _orderRepository = startupFixture.ServiceProvider.GetRequiredService<IOrderRepository>();
+        _cartCalculator = startupFixture.ServiceProvider.GetRequiredService<ICartCalculator>();
     }
 
     [Theory]
@@ -28,25 +27,39 @@ public class OrderCommandTests : IClassFixture<StartupFixture>
     [InlineData(150, 3, 450)]
     public async Task ShouldCreateOrderFromCart(decimal price, int quantity, decimal expectedTotal)
     {
-        var customer = new Customer();
+        var customer = new Customer()
+        {
+            Id = Guid.NewGuid(),
+        };
         var productId = Guid.NewGuid();
         var product = new Product(productId, "TestProduct", new Money(price), 100);
+        Order? capturedOrder = null;
 
         var cart = new Cart(customer.Id, customer.Name);
         cart.AddProduct(product.Id, product.Name, product.Price, quantity);
+
+        var cartRepositoryMock = new Mock<ICartRepository>();
+        cartRepositoryMock.Setup(x => x.GetByCustomerId(It.IsAny<Guid>())).Returns(cart);
+
+        var orderRepositoryMock = new Mock<IOrderRepository>();
+        orderRepositoryMock.Setup(x => x.Add(It.IsAny<Order>())).Callback<Order>(order => capturedOrder = order);
 
         var discountServiceMock = new Mock<IDiscountPolicyProvider>();
         discountServiceMock
             .Setup(x => x.GetPolicy(It.IsAny<string>()))
             .Returns(new NoDiscount());
         var command = new PlaceOrderCommand(customer.Id, string.Empty);
-        var orderResult = await _mediator.Send(command);
 
-        var order = _orderRepository.Find(orderResult.OrderId);
+        var handler = new PlaceOrderHandler(cartRepositoryMock.Object,
+            orderRepositoryMock.Object,
+            _cartCalculator,
+            discountServiceMock.Object);
 
-        Assert.Equal(customer.Id, order?.CustomerId);
-        Assert.Equal(productId, order?.Items[0].ProductId);
-        Assert.Equal(quantity, order?.Items[0].Quantity);
-        Assert.Equal(new Money(expectedTotal), order?.TotalAmount);
+        var orderResult = await handler.Handle(command, default);
+
+        Assert.Equal(customer.Id, capturedOrder?.CustomerId);
+        Assert.Equal(productId, capturedOrder?.Items[0].ProductId);
+        Assert.Equal(quantity, capturedOrder?.Items[0].Quantity);
+        Assert.Equal(new Money(expectedTotal), capturedOrder?.TotalAmount);
     }
 }
